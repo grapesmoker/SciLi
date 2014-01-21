@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
 import os
+import sys
+import pymongo
 
 from gi.repository import Gtk
-from ui import SciLiWindow
+from ui.SciLiWindow import SciLiWindow
 
 class SciLiApp(Gtk.Application):
 
@@ -13,6 +15,9 @@ class SciLiApp(Gtk.Application):
     def do_activate(self):
         win = SciLiWindow(self)
         win.show_all()
+
+    def do_startup(self):
+        Gtk.Application.do_startup(self)
 
 if __name__ == "__main__":
 
