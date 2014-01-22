@@ -79,7 +79,8 @@ class SciLiWindow(Gtk.ApplicationWindow):
         renderer_txt = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn("Actions", renderer_txt, text=0)
         self.left_view.append_column(column)
-        
+        self.left_view.connect("row-activated", self.on_left_row_activated)
+
         select = self.left_view.get_selection()
         select.connect("changed", self.on_selection_changed)
 
@@ -89,9 +90,23 @@ class SciLiWindow(Gtk.ApplicationWindow):
 
         model, treeiter = selection.get_selected()
         if treeiter is not None:
-            print model[treeiter][0]
+            pass
+            #print model[treeiter][0]
 
         # code to display stuff in central pane goes here
+
+    def on_left_row_activated(self, widget, path, column):
+
+        print path
+
+        tree_iter = self.left_store.get_iter(path)
+
+        val = self.left_store.get_value(tree_iter, 0)
+        print val
+        if val == 'Libraries':
+            citer = self.left_store.get_iter(path)
+            piter = self.left_store.iter_parent(citer)
+            print self.left_store[piter][0]
 
     def create_toolbar(self):
 

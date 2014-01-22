@@ -132,9 +132,9 @@ class NewRecordDialog(Gtk.Dialog):
 
         filename = self.entry_filename.get_text()
         if response == Gtk.ResponseType.OK:
-        if os.path.exists(filename)
-            self.entry_filename.set_text(filename)
-            parse_metadata(filename)
+            if os.path.exists(filename):
+                self.entry_filename.set_text(filename)
+                parse_metadata(filename)
 
         dialog.destroy()
 
