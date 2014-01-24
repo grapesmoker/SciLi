@@ -1,4 +1,5 @@
 import pymongo
+import os
 
 from gi.repository import Gtk
 
@@ -130,8 +131,9 @@ class NewRecordDialog(Gtk.Dialog):
 
         response = dialog.run()
 
-        filename = self.entry_filename.get_text()
+        filename = dialog.get_filename()
         if response == Gtk.ResponseType.OK:
+            print filename
             if os.path.exists(filename):
                 self.entry_filename.set_text(filename)
                 parse_metadata(filename)

@@ -36,14 +36,15 @@ class SciLiWindow(Gtk.ApplicationWindow):
 
         self.add(self.main_grid)
 
+        self.current_lib = None
+
         self.create_toolbar()
         self.setup_db()
         self.setup_left_pane()
+        self.setup_center_pane()
 
         self.library_action_group = Gtk.ActionGroup("library")
         self.record_action_group = Gtk.ActionGroup("record")
-
-        self.current_lib = None
 
     def setup_db(self):
 
@@ -86,6 +87,42 @@ class SciLiWindow(Gtk.ApplicationWindow):
 
         self.left_pane.add(self.left_view)
 
+    def setup_center_pane(self):
+        
+        # fields: title, author, journal, pub-date, file
+
+        self.library_store = Gtk.ListStore(str, str, str, str, str)
+        scroll_window = Gtk.ScrolledWindow()
+        scroll_window.set_hexpand(True)
+        self.center_pane.add(scroll_window)
+        self.library_view = Gtk.TreeView(model=self.library_store)
+
+        renderer = Gtk.CellRendererText()
+
+        title_col = Gtk.TreeViewColumn("Title", renderer, text=0)
+        author_col = Gtk.TreeViewColumn("Author", renderer, text=0)
+        journal_col = Gtk.TreeViewColumn("Journal", renderer, text=0)
+        pub_date_col = Gtk.TreeViewColumn("Publication Date", renderer, text=0)
+        filename_col = Gtk.TreeViewColumn("Filename", renderer, text=0)
+
+        self.library_view.append_column(title_col)
+        self.library_view.append_column(author_col)
+        self.library_view.append_column(journal_col)
+        self.library_view.append_column(pub_date_col)
+        self.library_view.append_column(filename_col)
+
+        scroll_window.add(self.library_view)
+
+        self.update_library_view()
+
+    def update_library_view(self):
+
+        if self.current_lib is not None:
+            all_records = self.records.find({'library': self.current_lib})
+            
+            for rec in all_records:
+                self.library_store.append(rec['title'], rec['authors'], rec['journal'], rec['pub_date'], rec['filename'])
+
     def on_selection_changed(self, selection):
 
         model, treeiter = selection.get_selected()
@@ -97,16 +134,15 @@ class SciLiWindow(Gtk.ApplicationWindow):
 
     def on_left_row_activated(self, widget, path, column):
 
-        print path
-
         tree_iter = self.left_store.get_iter(path)
+        piter = self.left_store.iter_parent(tree_iter)
 
-        val = self.left_store.get_value(tree_iter, 0)
-        print val
-        if val == 'Libraries':
-            citer = self.left_store.get_iter(path)
-            piter = self.left_store.iter_parent(citer)
-            print self.left_store[piter][0]
+        if piter is not None:
+            val = self.left_store.get_value(piter, 0)
+            if val == 'Libraries':
+                print self.left_store[tree_iter][0]
+                self.current_lib = self.left_store[tree_iter][0]
+                self.update_library_view()
 
     def create_toolbar(self):
 
@@ -196,6 +232,9 @@ class SciLiWindow(Gtk.ApplicationWindow):
                                                                            False).split('\n')
 
             print record
+            if self.current_lib is not None:
+                record['library'] = self.current_lib
+                self.records.insert(record)
                 
 
         dialog.destroy()
