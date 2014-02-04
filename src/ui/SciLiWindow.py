@@ -53,7 +53,7 @@ class SciLiWindow(Gtk.ApplicationWindow):
         self.libraries = self.db.libraries
         self.records = self.db.records
         self.collections = self.db.collections
-        
+
     def setup_left_pane(self):
 
         self.left_store = Gtk.TreeStore(str)
@@ -88,22 +88,23 @@ class SciLiWindow(Gtk.ApplicationWindow):
         self.left_pane.add(self.left_view)
 
     def setup_center_pane(self):
-        
+
         # fields: title, author, journal, pub-date, file
 
         self.library_store = Gtk.ListStore(str, str, str, str, str)
         scroll_window = Gtk.ScrolledWindow()
         scroll_window.set_hexpand(True)
+        scroll_window.set_vexpand(True)
         self.center_pane.add(scroll_window)
         self.library_view = Gtk.TreeView(model=self.library_store)
 
         renderer = Gtk.CellRendererText()
 
         title_col = Gtk.TreeViewColumn("Title", renderer, text=0)
-        author_col = Gtk.TreeViewColumn("Author", renderer, text=0)
-        journal_col = Gtk.TreeViewColumn("Journal", renderer, text=0)
-        pub_date_col = Gtk.TreeViewColumn("Publication Date", renderer, text=0)
-        filename_col = Gtk.TreeViewColumn("Filename", renderer, text=0)
+        author_col = Gtk.TreeViewColumn("Author", renderer, text=1)
+        journal_col = Gtk.TreeViewColumn("Journal", renderer, text=2)
+        pub_date_col = Gtk.TreeViewColumn("Publication Date", renderer, text=3)
+        filename_col = Gtk.TreeViewColumn("Filename", renderer, text=4)
 
         self.library_view.append_column(title_col)
         self.library_view.append_column(author_col)
@@ -119,9 +120,14 @@ class SciLiWindow(Gtk.ApplicationWindow):
 
         if self.current_lib is not None:
             all_records = self.records.find({'library': self.current_lib})
-            
+            print self.current_lib
+            print all_records
             for rec in all_records:
-                self.library_store.append(rec['title'], rec['authors'], rec['journal'], rec['pub_date'], rec['filename'])
+                authors = []
+                for auth in rec['authors']:
+                    authors.append(auth['last_name'] + ', ' + auth['first_name'])
+                print authors
+                self.library_store.append([rec['title'], '\n'.join(authors), rec['journal'], rec['pub_date'], rec['filename']])
 
     def on_selection_changed(self, selection):
 
@@ -140,7 +146,7 @@ class SciLiWindow(Gtk.ApplicationWindow):
         if piter is not None:
             val = self.left_store.get_value(piter, 0)
             if val == 'Libraries':
-                print self.left_store[tree_iter][0]
+                print self.left_store[tree_iter][0], 'debug'
                 self.current_lib = self.left_store[tree_iter][0]
                 self.update_library_view()
 
@@ -190,13 +196,14 @@ class SciLiWindow(Gtk.ApplicationWindow):
         dialog.destroy()
 
     def add_record(self, widget):
-        
+
         dialog = NewRecordDialog(self)
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
             record = {}
 
+            record['title'] = dialog.entry_title.get_text()
             record['filename'] = dialog.entry_filename.get_text()
             record['journal'] = dialog.entry_journal.get_text()
             record['pub_date'] = dialog.entry_pub_date.get_text()
@@ -209,16 +216,15 @@ class SciLiWindow(Gtk.ApplicationWindow):
                                                             dialog.text_buf_authors.get_end_iter(),
                                                             False).split('\n')
 
-            print authors_text
             authors = []
             for auth in authors_text:
                 if auth.find(',') != -1:
-                    first_name, last_name = auth.split(',')
+                    last_name, first_name = auth.split(',')
                 else:
                     first_name = ''
                     last_name = auth
-                    author = {'first_name': first_name, 'last_name': last_name}
-                    authors.append(author)
+                author = {'first_name': first_name, 'last_name': last_name}
+                authors.append(author)
 
             record['authors'] = authors
             record['keywords'] = dialog.text_buf_keywords.get_text(dialog.text_buf_keywords.get_start_iter(),
@@ -235,6 +241,6 @@ class SciLiWindow(Gtk.ApplicationWindow):
             if self.current_lib is not None:
                 record['library'] = self.current_lib
                 self.records.insert(record)
-                
+
 
         dialog.destroy()

@@ -13,7 +13,7 @@ class NewLibraryDialog(Gtk.Dialog):
         Gtk.Dialog.__init__(self, "New Library", parent, 0,
                             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                              Gtk.STOCK_OK, Gtk.ResponseType.OK))
-        
+
         box = self.get_content_area()
 
         label = Gtk.Label("Enter library name:")
@@ -25,12 +25,12 @@ class NewLibraryDialog(Gtk.Dialog):
         box.add(lib_name)
 
         self.show_all()
-        
+
 
 class NewRecordDialog(Gtk.Dialog):
 
     def __init__(self, parent):
-        
+
         Gtk.Dialog.__init__(self, "New Record", parent, 0,
                             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                              Gtk.STOCK_OK, Gtk.ResponseType.OK))
@@ -41,7 +41,8 @@ class NewRecordDialog(Gtk.Dialog):
 
         button = Gtk.Button("Choose file")
         button.connect("clicked", self.on_file_clicked)
-        
+
+        label_title = Gtk.Label("Title: ")
         label_filename = Gtk.Label("Filename: ")
         label_authors = Gtk.Label("Authors (Last, First; one per line): ")
         label_affiliations = Gtk.Label("Affiliations (one per line): ")
@@ -53,7 +54,8 @@ class NewRecordDialog(Gtk.Dialog):
         label_abstract = Gtk.Label("Abstract: ")
         label_keywords = Gtk.Label("Keywords (comma separated): ")
         label_url = Gtk.Label("URL: ")
-        
+
+        self.entry_title = Gtk.Entry()
         self.entry_filename = Gtk.Entry()
         self.text_authors = Gtk.TextView()
         self.text_buf_authors = self.text_authors.get_buffer()
@@ -79,36 +81,39 @@ class NewRecordDialog(Gtk.Dialog):
         grid.attach(self.entry_filename, 1, 0, 1, 1)
         grid.attach(button, 2, 0, 1, 1)
 
-        grid.attach(label_authors, 0, 1, 1, 1)
-        grid.attach(self.text_authors, 1, 1, 2, 1)
-        
-        grid.attach(label_affiliations, 0, 2, 1, 1)
-        grid.attach(self.text_affiliations, 1, 2, 2, 1)
-        
-        grid.attach(label_journal, 0, 3, 1, 1)
-        grid.attach(self.entry_journal, 1, 3, 1, 1)
-        
-        grid.attach(label_pub_date, 0, 4, 1, 1)
-        grid.attach(self.entry_pub_date, 1, 4, 1, 1)
-        
-        grid.attach(label_volume, 0, 5, 1, 1)
-        grid.attach(self.entry_volume, 1, 5, 1, 1)
-        
-        grid.attach(label_issue, 0, 6, 1, 1)
-        grid.attach(self.entry_issue, 1, 6, 1, 1)
-        
-        grid.attach(label_pages, 0, 7, 1, 1)
-        grid.attach(self.entry_pages, 1, 7, 1, 1)
-        
-        grid.attach(label_abstract, 0, 8, 1, 1)
-        grid.attach(self.text_abstract, 1, 8, 2, 1)
+        grid.attach(label_title, 0, 1, 1, 1)
+        grid.attach(self.entry_title, 1, 1, 1, 1)
 
-        grid.attach(label_keywords, 0, 9, 1, 1)
-        grid.attach(self.text_keywords, 1, 9, 2, 1)
-        
-        grid.attach(label_url, 0, 10, 1, 1)
-        grid.attach(self.entry_url, 1, 10, 1, 1)
-        
+        grid.attach(label_authors, 0, 2, 1, 1)
+        grid.attach(self.text_authors, 1, 2, 2, 1)
+
+        grid.attach(label_affiliations, 0, 3, 1, 1)
+        grid.attach(self.text_affiliations, 1, 3, 2, 1)
+
+        grid.attach(label_journal, 0, 4, 1, 1)
+        grid.attach(self.entry_journal, 1, 4, 1, 1)
+
+        grid.attach(label_pub_date, 0, 5, 1, 1)
+        grid.attach(self.entry_pub_date, 1, 5, 1, 1)
+
+        grid.attach(label_volume, 0, 6, 1, 1)
+        grid.attach(self.entry_volume, 1, 6, 1, 1)
+
+        grid.attach(label_issue, 0, 7, 1, 1)
+        grid.attach(self.entry_issue, 1, 7, 1, 1)
+
+        grid.attach(label_pages, 0, 8, 1, 1)
+        grid.attach(self.entry_pages, 1, 8, 1, 1)
+
+        grid.attach(label_abstract, 0, 9, 1, 1)
+        grid.attach(self.text_abstract, 1, 9, 2, 1)
+
+        grid.attach(label_keywords, 0, 10, 1, 1)
+        grid.attach(self.text_keywords, 1, 10, 2, 1)
+
+        grid.attach(label_url, 0, 11, 1, 1)
+        grid.attach(self.entry_url, 1, 11, 1, 1)
+
         box.add(grid)
         self.show_all()
 
@@ -139,7 +144,3 @@ class NewRecordDialog(Gtk.Dialog):
                 parse_metadata(filename)
 
         dialog.destroy()
-
-
-
-    
